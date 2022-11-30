@@ -1,0 +1,11 @@
+I=GEN;D=General;T=GROUP;
+I=DN;T=STRING;C=EDIT;D=Device Name;
+I=ON;T=STRING;C=EDIT;D=Owner Name;
+I=CLT@;T=INT;C=STATIC;D=Collector Input;O=1/1/2/2/3/3;
+I=TUN@;T=INT;C=STATIC;D=Temperature Unit;O=Celsius/0/Fahrenheit/1;
+I=MQTT;D=MQTT;T=GROUP;
+I=MIP@;T=STRING;C=IPCTRL;D=Endpoint;
+I=MID@;T=STRING;C=EDIT;D=Client ID;
+I=MQU@;T=STRING;C=EDIT;D=Username;
+I=MQP@;T=STRING;C=EDIT;D=Password;
+I=MQO@;T=INT;C=STATIC;D=Output Mode;O=A/0/B/1/C/2;

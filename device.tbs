@@ -1,0 +1,179 @@
+include "global.tbh"
+
+
+sub close_interface_sockets(interface as pl_sock_interfaces)
+    dim f,sock_num_bup as byte
+    dim i as word
+
+    sock_num_bup=sock.num
+
+    for f=0 to sock.numofsock-1
+        sock.num=f
+        if sock.targetinterface=interface then
+            sock.discard
+        end if
+    next f
+
+    i=sys.timercount
+
+    wait_close_interface_sockets:
+    for f=0 to sock.numofsock-1
+        sock.num=f
+        if sock.targetinterface=interface and sock.statesimple<>PL_SSTS_CLOSED and sys.timercount-i<3 and sys.timercount>=i then
+            goto wait_close_interface_sockets
+        end if
+    next f
+
+    sock.num=sock_num_bup
+
+end sub
+ 
+
+sub callback_dhcp_ok(renew as no_yes, interface as pl_sock_interfaces, byref ip as string, byref gateway_ip as string, byref netmask as string, lease_time as dword)
+    
+    if interface=PL_SOCK_INTERFACE_NET then
+        if renew=YES and net.ip<>ip then
+            'this is a lease renewal and the DHCP server has issues new IP
+            'it is better to reboot than deal with the implications of the changed IP
+            sys.reboot
+        end if
+
+        #if DEV_DEBUG_PRINT
+            dev_debugprint("Ethernet DHCP OK ("+ip+")")
+        #endif
+
+        if net.ip<>ip then
+            sock.inconenabledmaster=NO
+            close_interface_sockets(PL_SOCK_INTERFACE_NET)
+            net.ip=ip
+            if gateway_ip<>"" then net.gatewayip=gateway_ip
+            if netmask<>"" then net.netmask=netmask
+            sock.inconenabledmaster=YES
+            
+        end if
+    end if
+            
+
+    if interface=PL_SOCK_INTERFACE_NET then
+		if mqtt_endpoint<>DEFAULT_MQTT_ENDPOINT then
+			 mqtt_start(MQTT_INTERFACE,mqtt_endpoint,MQTT_DESTINATION_PORT,mqtt_username,mqtt_password,mqtt_clientid,MQTT_TLS)
+        else   
+			sys.debugprint("Not connecting to MQTT as the configured endpoint is the default endpoint"+ "\r\n")
+        end if
+    end if
+
+end sub
+        
+
+sub callback_dhcp_failure(interface as pl_sock_interfaces,failure_code as en_dhcp_status_codes)
+    
+end sub
+        
+
+sub callback_dhcp_pre_clear_ip(interface as pl_sock_interfaces)
+    
+end sub
+        
+
+sub callback_dhcp_pre_buffrq(required_buff_pages as byte)
+    
+end sub
+        
+
+sub callback_dhcp_buff_released()
+    
+end sub
+        
+
+sub callback_stg_error(byref stg_name_or_num as string,index as byte,status as en_stg_status_codes)
+    
+end sub
+        
+
+sub callback_stg_pre_get(byref stg_name_or_num as string,index as byte,byref stg_value as string)
+    
+end sub
+        
+
+sub callback_stg_post_set(byref stg_name_or_num as string, index as byte,byref stg_value as string)
+    
+end sub
+        
+
+function callback_stg_vm_read(address as word) as byte
+    
+end function
+        
+
+sub callback_stg_vm_write(data_to_write as byte, address as word)
+    
+end sub
+
+
+sub callback_dns_failure(status as en_dns_status_codes)
+    
+end sub
+        
+
+sub callback_dns_answer_acquired(return_type as en_dns_return_type, byref return_string as string)
+    mqtt_dns_answer_acquired(return_type, return_string)
+end sub
+        
+
+sub callback_dns_ok()
+    
+end sub
+        
+
+sub callback_dns_pre_buffrq(num_of_pages_required as byte)
+    
+end sub
+        
+
+sub callback_dns_buff_released()
+    
+end sub
+        
+
+sub callback_mqtt_connect_ok()
+    pat.play("G~",PL_PAT_CANINT)
+    mqtt_connect_lost=NO
+end sub
+        
+
+sub callback_mqtt_connect_lost()
+    mqtt_connect_lost=YES
+end sub
+        
+       
+sub callback_mqtt_notif(byref topic as string,byref data as string,remaining_bytes as dword)
+    
+end sub
+
+sub callback_mqtt_sub_ok()
+    
+end sub
+        
+
+sub callback_login_event(mode as cmd_modes)
+    
+end sub
+            
+
+function callback_get_timeout(mode as cmd_modes) as word
+
+    select case mode
+    case CMD_MODE_NONE:
+
+    case CMD_MODE_UDP:
+        goto get_timeout
+    case else
+get_timeout:
+        callback_get_timeout=LOGIN_TIMEOUT
+    end select
+        
+end function
+            
+
+
+ 

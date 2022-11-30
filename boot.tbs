@@ -1,0 +1,120 @@
+include "global.tbh"
+dim DNS_socket as byte
+sub boot()
+    
+
+ current_interface = PL_SOCK_INTERFACE_NET
+    dim f as byte
+    for f=0 to MAX_NUM_INTERFACES-1
+        interface_ready(f)=NO
+    next f
+
+    device_net_ip = "1.0.0.1"
+    device_net_mask = "255.255.255.0"
+    device_net_gateway = "1.0.0.1"
+    'Ethernet setup
+    '================================================================
+    dim use_dhcp as boolean = 1 
+
+    if use_dhcp = false then
+        net.ip=device_net_ip
+        net.netmask=device_net_mask
+        net.gatewayip=device_net_gateway
+    else
+        'ethernet dhcp
+        dhcp_start(PL_SOCK_INTERFACE_NET,device_net_ip,"")
+    end if
+    '-----------------------------------------------------------------
+
+    'Setting Library Initialization
+    '================================================================
+    dim stg_init_code as en_stg_status_codes
+    dim stg_name as string(STG_MAX_SETTING_NAME_LEN)
+    if stg_start()<>EN_STG_STATUS_OK then 
+        pat.play("R-R-~",PL_PAT_CANINT)
+        sys.halt
+    end if
+    stg_init_code=stg_check_all(stg_name)
+    select case stg_init_code
+    case EN_STG_STATUS_OK:
+    '--- all good ---
+    case EN_STG_STATUS_INVALID, EN_STG_STATUS_FAILURE:
+        if stg_restore_multiple(EN_STG_INIT_MODE_NORMAL)<>EN_STG_STATUS_OK then 
+            pat.play("R-R-~",PL_PAT_CANINT)
+            sys.halt
+        end if
+    case else:
+        'some other trouble
+        pat.play("R-R-~",PL_PAT_CANINT)
+        sys.halt
+    end select
+   
+	temperature_unit = stg_get("TUN", 0)
+	mqtt_device_name = stg_get("DN", 0)
+	mqtt_clientid = stg_get("MID", 0)
+	mqtt_username = stg_get("MQU", 0)
+	mqtt_password = stg_get("MQP", 0)
+	mqtt_endpoint = stg_get("MIP", 0)
+	mqtt_output_mode = stg_get("MQO", 0)
+	
+    '-----------------------------------------------------------------
+	
+    '-----------------------------------------------------------------
+    'DNS setup
+    '================================================================
+    DNS_socket=sock_get("DNS")
+    dns_start(DNS_socket)
+    'Making a DNS query:
+    'dns_connect(PL_SOCK_INTERFACE_NET, "8.8.4.4",0)
+    'dns_query("google.com")
+    'get the response in callback_dns_answer_acquired
+    '-----------------------------------------------------------------
+    'Fd(flash disk) setup
+    '================================================================
+    if fd.mount<>PL_FD_STATUS_OK then
+        if fd.formatj(fd.availableflashspace/2,32,100)<>PL_FD_STATUS_OK then
+            sys.halt
+        end if
+    
+        if fd.mount<>PL_FD_STATUS_OK then
+            sys.halt
+        end if
+    end if
+    '-----------------------------------------------------------------
+    'Tibbit 53 on socket 1
+    '================================================================
+    if tbt53_init(YES,TBT53_S1_CLK,TBT53_S1_DATA,TBT53_S1_CHANNEL, "S1")<>OK then
+        sys.debugprint("SSI channel could not be allocated, using bit banging instead.\r\n")
+    end if
+    '-----------------------------------------------------------------
+        
+    'Tibbit 53 on socket 5
+    '================================================================
+    if tbt53_init(YES,TBT53_S5_CLK,TBT53_S5_DATA,TBT53_S5_CHANNEL, "S2")<>OK then
+        sys.debugprint("SSI channel could not be allocated, using bit banging instead.\r\n")
+    end if
+    '-----------------------------------------------------------------
+        
+    'Tibbit 53 on socket 9
+    '================================================================
+    if tbt53_init(YES,TBT53_S9_CLK,TBT53_S9_DATA,TBT53_S9_CHANNEL, "S3")<>OK then
+        sys.debugprint("SSI channel could not be allocated, using bit banging instead.\r\n")
+    end if
+    '-----------------------------------------------------------------
+        
+    'Tibbit 53 on socket 13
+    '================================================================
+    if tbt53_init(YES,TBT53_S13_CLK,TBT53_S13_DATA,TBT53_S13_CHANNEL, "S4")<>OK then
+        sys.debugprint("SSI channel could not be allocated, using bit banging instead.\r\n")
+    end if
+    '-----------------------------------------------------------------
+        
+  
+    net_cmd_init()
+    init_x_flags()
+    
+    pat.play("B-B-B-",PL_PAT_CANINT)
+	
+	boot_finished = YES
+	Collection_timer = 5 * 1000 / sys.onsystimerperiod / 10
+end sub

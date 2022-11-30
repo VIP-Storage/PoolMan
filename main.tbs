@@ -1,0 +1,200 @@
+include "global.tbh"
+
+'sock 1: tibbit 53 name TBT53_S1
+'sock 5: tibbit 53 name TBT53_S5
+'sock 9: tibbit 53 name TBT53_S9
+'sock 13: tibbit 53 name TBT53_S13
+'sock 25: tibbit 23 
+
+dim interface_ready(MAX_NUM_INTERFACES) as no_yes
+dim boot_finished as no_yes = NO
+
+dim current_interface as pl_sock_interfaces
+
+dim TBT53_S1_CHANNEL as byte
+
+dim TBT53_S5_CHANNEL as byte
+
+dim TBT53_S9_CHANNEL as byte
+
+dim TBT53_S13_CHANNEL as byte
+
+
+	
+
+
+dim device_net_ip as string
+dim device_net_mask as string
+dim device_net_gateway as string
+
+dim temperature_unit as byte = 0
+dim mqtt_device_name as string = "poolman1"
+dim mqtt_output_mode as byte = 0
+dim mqtt_endpoint as string = "0.0.0.0"
+dim mqtt_username as string = ""
+dim mqtt_password as string = ""
+dim mqtt_clientid as string = ""
+dim mqtt_connect_lost as no_yes = YES
+
+dim Collection_timer as dword
+dim Collection_timer_count as dword
+
+sub publish_mqtt_data(byref measurement as string, byref data as string)
+	sys.debugprint(measurement + ": " + data + "\r\n")
+
+	if mqtt_connect_lost = NO then
+		sys.debugprint("Output mode: " + str(mqtt_output_mode) +"\r\n")
+		if mqtt_output_mode = 0 then
+			mqtt_publish(measurement + "/" + mqtt_device_name, data, QOS_AT_MOST_ONCE)
+		else if mqtt_output_mode = 1 then
+			mqtt_publish(mqtt_device_name + "/" + measurement, data, QOS_AT_MOST_ONCE)
+		else if mqtt_output_mode = 2 then
+			mqtt_publish("sensors/" + device_id() + "/" + measurement, data , QOS_AT_MOST_ONCE)
+		end if
+	end if
+end sub
+
+sub process()
+	dim sensor_name as string
+	dim sensor as byte
+	dim channel as byte
+	dim last_channel as byte = -1
+	dim sensor_value_string as string
+	dim sensor_mqtt_name as string
+	
+	for sensor = 0 to 3
+		get_channel(sensor, channel)
+		sensor_name = get_channel_sensor_name(sensor)
+		sensor_mqtt_name = get_channel_sensor_mqtt_name(sensor)
+		
+		dim temperature as real
+		if last_channel <> channel then
+			sys.debugprint("=====================[ " + str(sensor) + " ]==========================" + CR_LF)
+			
+			if tbt53_get_current(temperature, channel)=OK then
+				
+				sys.debugprint(sensor_name + "raw temperature (pre):" + ftostr(temperature,FTOSTR_MODE_AUTO, 4) + CR_LF)
+				dim new_temperature as real = get_temperature(temperature)
+				
+				sys.debugprint(sensor_name + "new temperature:" + ftostr(new_temperature,FTOSTR_MODE_AUTO, 4) + CR_LF)
+				sys.debugprint(sensor_name + "raw temperature (post):" + ftostr(temperature,FTOSTR_MODE_AUTO, 4) + CR_LF)
+				
+				'if (temperature_unit = 0) then
+				'	temperature = (temperature - 32) * 0.5556 
+				'end if
+				
+				sensor_value_string = ftostr(new_temperature,FTOSTR_MODE_AUTO, 4)
+				
+				sys.debugprint(sensor_name + ":" + sensor_value_string + CR_LF)
+				publish_mqtt_data(sensor_mqtt_name, sensor_value_string)
+			else
+				sys.debugprint(sensor_name + ": open loop" + CR_LF)
+			end if
+			
+			sys.debugprint("====================================================" + CR_LF + CR_LF)
+		
+			last_channel = channel
+		end if
+	
+	next sensor
+end sub
+
+sub on_sys_init()
+    boot()
+end sub
+
+sub on_sys_timer()
+	if boot_finished = YES then
+		dhcp_proc_timer()
+		dns_proc_timer()
+		mqtt_proc_timer()
+		
+		Collection_timer_count = Collection_timer_count + 1
+		if Collection_timer_count > Collection_timer then
+			Collection_timer_count = 0
+			process()
+		end if
+	end if
+end sub
+
+
+sub on_sock_data_arrival()
+    dhcp_proc_data()
+	dns_proc_data()
+	mqtt_proc_data()
+
+    net_cmd_proc(CMD_MODE_UDP,error_mode)
+end sub
+
+sub on_sock_event(newstate as pl_sock_state,newstatesimple as pl_sock_state_simple)
+	mqtt_sock_event(newstate, newstatesimple)
+end sub
+
+	
+sub get_channel(num as byte, byref channel as byte)
+	select case num
+		case 0:
+			channel = TBT53_S1_CHANNEL
+		case 1:
+			channel = TBT53_S5_CHANNEL
+		case 2:
+			channel = TBT53_S9_CHANNEL
+		case 3:
+			channel = TBT53_S13_CHANNEL
+	end select
+end sub
+
+public function get_channel_sensor_name(num as byte) as string
+	dim channel_sensor_name as string
+	select case num
+		case 0:
+			channel_sensor_name = "S1"
+		case 1:
+			channel_sensor_name = "S5"
+		case 2:
+			channel_sensor_name = "S9"
+		case 3:
+			channel_sensor_name = "S13"
+	end select
+	
+	get_channel_sensor_name = channel_sensor_name
+end function
+
+
+public function get_channel_sensor_mqtt_name(num as byte) as string
+	dim mqtt_sensor_name as string
+	select case num
+		case 0:
+			mqtt_sensor_name = "sensor1"
+		case 1:
+			mqtt_sensor_name = "sensor2"
+		case 2:
+			mqtt_sensor_name = "sensor3"
+		case 3:
+			mqtt_sensor_name = "sensor4"
+	end select
+	
+	get_channel_sensor_mqtt_name = mqtt_sensor_name
+end function
+
+
+'' Generate our device ID from our MAC address
+function device_id() as string
+	dim mac as string = net.mac
+	dim dot_pos as short = instr(0, mac, ".", 1)
+
+	while (dot_pos <> 0)
+		dim curr_len as short = len(mac)
+		dim left_str as string = mid(mac, 0, dot_pos - 1)
+		mac = left_str + "-" + mid(mac, dot_pos + 1, curr_len - (len(left_str) + 1))
+		dot_pos =  instr(0, mac, ".", 1)
+	wend
+
+	device_id = mac
+end function
+
+
+function get_temperature(current_value as real) as real
+	'get_temperature = ((TEMP_MAX - TEMP_MIN) / (CURRENT_MAX - CURRENT_MIN)) * (current_value - CURRENT_MIN) + TEMP_MIN
+	get_temperature = 6.25 * (current_value - 4.0)
+end function

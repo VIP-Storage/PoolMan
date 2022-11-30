@@ -1,0 +1,16 @@
+>>DN	E	S	1	0	28	I	PoolMan1	Device Name
+>>PW	E	S	1	0	16	I	^	Password
+>>ON	E	S	1	0	8	I	mowner	Owner Name
+>>CLT	E	B	1	1	4	I	1	Collector
+>>MIP	E	D	1	0	10	I	0.0.0.0	MQTT IP
+>>MQU	E	S	1	0	15	I	tibbo	MQTT Username
+>>MID	E	S	1	0	28	I	collector_default	MQTT Client ID
+>>MQP	E	S	1	0	28	I	tibbo	MQTT Password
+>>MQO	E	B	1	0	10	I	0	MQTT Mode
+>>TUN	E	B	1	0	1	I	0	Temperature Unit
+#define STG_DESCRIPTOR_FILE "settings.xtxt"
+#define STG_DEBUG_PRINT 1
+#define STG_MAX_NUM_SETTINGS 10
+#define STG_RAM_ARRAY_SIZE 0
+#define STG_MAX_SETTING_NAME_LEN 3
+#define STG_MAX_SETTING_VALUE_LEN 39

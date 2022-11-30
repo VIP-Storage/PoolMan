@@ -1,0 +1,290 @@
+{
+  "id": "0d05e7f5-45f4-47e3-bb03-93e495f13e09",
+  "name": "PoolMan",
+  "device": "TPP3W(G2)",
+  "description": "",
+  "features": [
+    {
+      "id": "general",
+      "name": "General",
+      "settings": [
+        {
+          "id": "ID",
+          "value": "la2o351o7dxk7jtpv1w"
+        },
+        {
+          "id": "LEDPAT",
+          "value": "1"
+        },
+        {
+          "id": "FIRMWARENAME",
+          "value": "MyDevice"
+        },
+        {
+          "id": "FIRMWAREVERSION",
+          "value": "1.0.0"
+        },
+        {
+          "id": "INTERFACE_SWITCHING",
+          "value": "0"
+        },
+        {
+          "id": "DEFAULT_INTERFACE",
+          "value": "PL_SOCK_INTERFACE_NET"
+        }
+      ]
+    },
+    {
+      "id": "boardsetting",
+      "name": "Board Settings",
+      "settings": [
+        {
+          "id": "ID",
+          "value": "la2o351og3byzzvrjwk"
+        },
+        {
+          "id": "POE",
+          "value": "1"
+        },
+        {
+          "id": "5VDIRECT",
+          "value": "0"
+        },
+        {
+          "id": "WIFIANTENNA",
+          "value": "0"
+        },
+        {
+          "id": "GPRSANTENNA",
+          "value": "0"
+        },
+        {
+          "id": "TPB",
+          "value": "true"
+        },
+        {
+          "id": "VPK",
+          "value": "1"
+        },
+        {
+          "id": "DIN",
+          "value": "1"
+        },
+        {
+          "id": "POWERADAPTER",
+          "value": "apr-p0008"
+        },
+        {
+          "id": "ASM",
+          "value": "asm+rp"
+        },
+        {
+          "id": "NOTES",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "id": "tibbit_53",
+      "name": "Tibbit 53",
+      "settings": [
+        {
+          "id": "ID",
+          "value": "la2o39k2fvr1kama4d"
+        },
+        {
+          "id": "SOCKET",
+          "value": "1"
+        },
+        {
+          "id": "TIBBIT",
+          "value": "53"
+        },
+        {
+          "id": "PLATFORM",
+          "value": ""
+        },
+        {
+          "id": "NAME",
+          "value": "TBT53_S1"
+        },
+        {
+          "id": "USESSI",
+          "value": "YES"
+        }
+      ]
+    },
+    {
+      "id": "tibbit_53",
+      "name": "Tibbit 53",
+      "settings": [
+        {
+          "id": "ID",
+          "value": "la2o3ezd1b5rshlmkiz"
+        },
+        {
+          "id": "SOCKET",
+          "value": "5"
+        },
+        {
+          "id": "TIBBIT",
+          "value": "53"
+        },
+        {
+          "id": "PLATFORM",
+          "value": ""
+        },
+        {
+          "id": "NAME",
+          "value": "TBT53_S5"
+        },
+        {
+          "id": "USESSI",
+          "value": "YES"
+        }
+      ]
+    },
+    {
+      "id": "tibbit_53",
+      "name": "Tibbit 53",
+      "settings": [
+        {
+          "id": "ID",
+          "value": "la2o3j4r358tmcv9cb1"
+        },
+        {
+          "id": "SOCKET",
+          "value": "9"
+        },
+        {
+          "id": "TIBBIT",
+          "value": "53"
+        },
+        {
+          "id": "PLATFORM",
+          "value": ""
+        },
+        {
+          "id": "NAME",
+          "value": "TBT53_S9"
+        },
+        {
+          "id": "USESSI",
+          "value": "YES"
+        }
+      ]
+    },
+    {
+      "id": "tibbit_53",
+      "name": "Tibbit 53",
+      "settings": [
+        {
+          "id": "ID",
+          "value": "la2o3ng9ftj6sfhwbg"
+        },
+        {
+          "id": "SOCKET",
+          "value": "13"
+        },
+        {
+          "id": "TIBBIT",
+          "value": "53"
+        },
+        {
+          "id": "PLATFORM",
+          "value": ""
+        },
+        {
+          "id": "NAME",
+          "value": "TBT53_S13"
+        },
+        {
+          "id": "USESSI",
+          "value": "YES"
+        }
+      ]
+    },
+    {
+      "id": "tibbit_23",
+      "name": "tibbit_23",
+      "settings": [
+        {
+          "id": "ID",
+          "value": "la2o3rpz4a5rfmzx9eu"
+        },
+        {
+          "id": "SOCKET",
+          "value": "25"
+        },
+        {
+          "id": "TIBBIT",
+          "value": "23"
+        },
+        {
+          "id": "PLATFORM",
+          "value": ""
+        }
+      ]
+    },
+    {
+      "id": "tibbit_53",
+      "name": "Tibbit 53",
+      "settings": [
+        {
+          "id": "ID",
+          "value": "la2o3vpzb5yv70r8ayk"
+        },
+        {
+          "id": "SOCKET",
+          "value": "21"
+        },
+        {
+          "id": "TIBBIT",
+          "value": "53"
+        },
+        {
+          "id": "PLATFORM",
+          "value": ""
+        },
+        {
+          "id": "NAME",
+          "value": "TBT53_S21"
+        },
+        {
+          "id": "USESSI",
+          "value": "YES"
+        }
+      ]
+    },
+    {
+      "id": "tibbit_53",
+      "name": "Tibbit 53",
+      "settings": [
+        {
+          "id": "ID",
+          "value": "la2o3zpg696ouwo22ls"
+        },
+        {
+          "id": "SOCKET",
+          "value": "17"
+        },
+        {
+          "id": "TIBBIT",
+          "value": "53"
+        },
+        {
+          "id": "PLATFORM",
+          "value": ""
+        },
+        {
+          "id": "NAME",
+          "value": "TBT53_S17"
+        },
+        {
+          "id": "USESSI",
+          "value": "YES"
+        }
+      ]
+    }
+  ]
+}
